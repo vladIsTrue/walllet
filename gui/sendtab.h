@@ -1,8 +1,10 @@
 #pragma once
 
+#include <QString>
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class SendTab;
 }
 
@@ -15,6 +17,11 @@ public:
     ~SendTab();
 
     void initializeUI();
+
+    void setSignalsSlots();
+
+signals:
+    void pay(QString);
 
 private:
     Ui::SendTab *ui;

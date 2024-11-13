@@ -41,7 +41,7 @@
        <property name="tabsClosable">
         <bool>false</bool>
        </property>
-       <widget class="SendTab" name="send">
+       <widget class="SendTab" name="sendTab">
         <attribute name="title">
          <string>send</string>
         </attribute>

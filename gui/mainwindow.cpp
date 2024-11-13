@@ -1,16 +1,17 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "sendtab.h"
+#include "newwallet.h"
+#include "info.h"
+#include "changepass.h"
+#include "../logic/utils.h"
 
-#include <QDebug>
-
-#include <QToolBar>
 #include <QSettings>
 #include <QFileDialog>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(IWallet *wllt)
+    : ui(new Ui::MainWindow)
+    , wallet(wllt)
 {
     initializeUI();
 
@@ -32,12 +33,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::walletInfo()
 {
-    qDebug() << "walletInfo";
+    Info info(wallet->info(), this);
+    info.exec();
 }
 
 void MainWindow::changePassword()
 {
-    qDebug() << "passwordChanged";
+    ChangePass dialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        wallet->changePassword(dialog.password());
+    }
 }
 
 void MainWindow::openWallet()
@@ -45,17 +51,18 @@ void MainWindow::openWallet()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open wallet"), walletsPath,
                                                     tr("Wallets (*)"));
 
-    // TODO: // reopen wallet
+    if (auto data = logic::dataParser(fileName); data.has_value())
+        wallet->init(data.value());
 }
 
 void MainWindow::newWallet()
 {
-    // TODO QDialog
-}
-
-void MainWindow::quit()
-{
-
+    NewWallet dialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        dialog.name();
+        dialog.password();
+    }
 }
 
 void MainWindow::initializeUI()
@@ -65,6 +72,16 @@ void MainWindow::initializeUI()
 
     createMenuBar();
     updateStatusBar();
+
+    setSignalsSlots();
+}
+
+void MainWindow::setSignalsSlots()
+{
+    connect(ui->sendTab, &SendTab::pay, [=](const QString &data)
+    {
+        emit pay(data);
+    });
 }
 
 void MainWindow::createMenuBar()
@@ -90,13 +107,8 @@ void MainWindow::createFile()
     newAction->setShortcuts(QKeySequence::New);
     connect(newAction, &QAction::triggered, this, &MainWindow::newWallet);
 
-    QAction *quitAction = new QAction(tr("&Quit"), this);
-    quitAction->setShortcuts(QKeySequence::Quit);
-    connect(quitAction, &QAction::triggered, this, &MainWindow::quit);
-
     fileMenu->addAction(openAction);
     fileMenu->addAction(newAction);
-    fileMenu->addAction(quitAction);
 }
 
 void MainWindow::createWallet()

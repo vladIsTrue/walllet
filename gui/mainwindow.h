@@ -1,21 +1,27 @@
 #pragma once
 
+#include "../logic/iwallet.h"
+
 #include <QDir>
 #include <QMainWindow>
 
-QT_BEGIN_NAMESPACE
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
-QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    using IWallet = logic::IWallet;
+
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(IWallet *wllt);
     ~MainWindow();
+
+signals:
+    void pay(QString);
 
 private:
     void initializeUI();
@@ -32,10 +38,13 @@ private:
 
     void openWallet();
     void newWallet();
-    void quit();
+
+    void setSignalsSlots();
 
 private:
     Ui::MainWindow *ui;
+
+    IWallet *wallet;
 
     QString walletsPath = QDir::homePath();
 };

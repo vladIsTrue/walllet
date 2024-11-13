@@ -14,8 +14,19 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        mainwindow.h mainwindow.cpp mainwindow.ui
-        sendtab.h sendtab.cpp sendtab.ui
+
+        gui/mainwindow.h gui/mainwindow.cpp gui/mainwindow.ui
+        gui/sendtab.h gui/sendtab.cpp gui/sendtab.ui
+        gui/newwallet.h gui/newwallet.cpp gui/newwallet.ui
+        gui/info.h gui/info.cpp gui/info.ui
+        gui/changepass.h gui/changepass.cpp gui/changepass.ui
+
+        logic/iwallet.h
+        logic/wallet.h logic/wallet.cpp
+        logic/utils.h logic/utils.cpp
+        logic/paymentsystem.h logic/paymentsystem.cpp
+
+        manager.h manager.cpp
 )
 
 add_executable(wallet
@@ -24,7 +35,4 @@ add_executable(wallet
 
 target_link_libraries(wallet PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-
-# TODO install
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/gui)
